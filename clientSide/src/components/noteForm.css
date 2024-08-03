@@ -1,0 +1,60 @@
+.note-form {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Form control styling */
+.note-form .form-control {
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.3s ease;
+}
+
+/* Placeholder color */
+.note-form .form-control::placeholder {
+    color: #6c757d;
+}
+
+/* Form control focus state */
+.note-form .form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Button group styling */
+.note-form .btn-group .btn {
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+
+.note-form .btn-group .btn:hover {
+    transform: scale(1.05);
+}
+
+.note-form .btn-group .btn-primary {
+    background: #007bff;
+    border: none;
+}
+
+.note-form .btn-group .btn-secondary {
+    background: #6c757d;
+    border: none;
+}
+
+.note-form .form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+.note-form .invalid-feedback {
+    font-size: 0.875rem;
+    color: #dc3545;
+}
+
+.note-form .btn .me-2 {
+    margin-right: 0.5rem;
+}

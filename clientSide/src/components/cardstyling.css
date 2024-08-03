@@ -1,0 +1,94 @@
+.note-card {
+    margin: 1rem auto;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    background-color: #ffffff;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+}
+
+.note-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+    background-color: #f9f9f9;
+}
+
+.note-card-header {
+    background: linear-gradient(135deg, #e0e0e0 0%, #ffffff 100%);
+    padding: 1.5rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.note-card-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.note-card-subtitle {
+    font-size: 1rem;
+    color: #777;
+}
+
+.note-card-content {
+    font-size: 1.125rem;
+    color: #333;
+    line-height: 1.6;
+    padding: 1rem;
+    background-color: #f7f7f7;
+}
+
+.note-card-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem;
+    border-top: 1px solid #ddd;
+    background: #f9f9f9;
+}
+
+.icon {
+    cursor: pointer;
+    margin-left: 1rem;
+    font-size: 1.5rem;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.edit-icon {
+    font-size: 20px;
+    color: #007bff;
+}
+
+.edit-icon:hover {
+    color: #0056b3;
+    transform: scale(1.1);
+}
+
+.trash-can {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+}
+
+.trash-can-body {
+    font-size: 20px;
+    cursor: pointer;
+    color: red;
+}
+
+.trash-can-lid {
+    width: 20px;
+    height: 4px;
+    background-color: red;
+    position: absolute;
+    top: -6px;
+    left: 0;
+    transform-origin: left center;
+    transition: transform 0.3s ease-in-out;
+}
+
+.trash-icon-container:hover .trash-can-lid {
+    transform: rotate(-45deg);
+}

@@ -1,0 +1,48 @@
+.nav-pills {
+    background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+    border-radius: 50px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nav-pills .nav-link {
+    color: #ffffff;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor:pointer;
+    display:flex;
+    align-items: center;
+    flex-direction: row;
+    gap:2px;
+}
+
+.nav-pills .nav-link.active {
+    background: #ffffff;
+    color: #182848;
+    border-radius: 50px;
+}
+
+.nav-pills .nav-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+}
+
+
+.nav-pills .nav-link.btn-primary {
+    background: #ff7e5f;
+    color: #ffffff;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.nav-pills .nav-link.btn-primary:hover {
+    background: #feb47b;
+    transform: scale(1.05);
+}
+
+.ml-auto {
+    margin-left: auto !important;
+}
+
+.mr-auto {
+    margin-right: auto !important;
+}
