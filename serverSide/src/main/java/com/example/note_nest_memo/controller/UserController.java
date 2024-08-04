@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +27,7 @@ public class UserController {
 	private UserServiceImp userServiceImp;
 	private int count = 0;
 	
-	@RequestMapping( value = "/create" , method = RequestMethod.POST)
+	@RequestMapping( value = "/create" , method = RequestMethod.POST , produces = MediaType.APPLICATION_JSON_VALUE , consumes  = MediaType.APPLICATION_JSON_VALUE)
 	    public ResponseEntity<Object> createUser(@RequestBody userDto user){
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("message", "You Salubriously Created User!");
@@ -36,7 +37,7 @@ public class UserController {
 	        return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	  }
 	
-	@RequestMapping( value = "/update/{userId}" , method = RequestMethod.PUT)
+	@RequestMapping( value = "/update/{userId}" , method = RequestMethod.PUT , produces = MediaType.APPLICATION_JSON_VALUE , consumes  = MediaType.APPLICATION_JSON_VALUE)
 	    public ResponseEntity<Object> updateUser(@PathVariable Integer userId , @RequestBody userDto user){
 	       userDto updatedUser = userServiceImp.updateUser(userId, user);
 		    Map<String, Object> response = new HashMap<>();
@@ -46,7 +47,7 @@ public class UserController {
 	        return ResponseEntity.status(HttpStatus.OK).body(response);
 	  }
 	
-	  @RequestMapping( value = "/delete/{userId}" , method = RequestMethod.DELETE)
+	  @RequestMapping( value = "/delete/{userId}" , method = RequestMethod.DELETE,produces = MediaType.APPLICATION_JSON_VALUE )
 	    public ResponseEntity<String> deleteUser(@PathVariable Integer userId){
 	        userServiceImp.deleteUser(userId);
 	        return ResponseEntity.ok("User deleted successfully");
@@ -58,13 +59,13 @@ public class UserController {
 	        return ResponseEntity.ok(userDto);
 	    }
 	    
-	    @RequestMapping( value = "/" , method = RequestMethod.GET)
+	    @RequestMapping( value = "/" , method = RequestMethod.GET ,produces = MediaType.APPLICATION_JSON_VALUE , consumes  = MediaType.APPLICATION_JSON_VALUE)
 	    public ResponseEntity<List<userDto>> getAllUsers(){
 	        List<userDto> userDtos =  userServiceImp.getAllUsers();
 	        return ResponseEntity.ok(userDtos);
 	    }
 	    
-	    @RequestMapping(value = "/login" , method =  RequestMethod.POST)
+	    @RequestMapping(value = "/login" , method =  RequestMethod.POST ,produces = MediaType.APPLICATION_JSON_VALUE)
 	    public ResponseEntity<Map<String, Object>> userLogin(@RequestBody Map<String , String> loginBody){
 	    	   Map<String, Object> response = new HashMap<>();
 	        try {
