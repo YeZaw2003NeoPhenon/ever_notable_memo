@@ -3,10 +3,10 @@ package com.example.note_nest_memo.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +26,7 @@ public class NotesController {
 	private NoteServiceImp noteServiceImp;
 	
 	private int count = 0;
-	@RequestMapping( value = "/create/{userId}" , method = RequestMethod.POST)
+	@RequestMapping( value = "/create/{userId}" , method = RequestMethod.POST ,  produces = MediaType.APPLICATION_JSON_VALUE , consumes =  MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> createNotes( @RequestBody notesDto notesDto , @PathVariable String userId ){
 		
 		notesDto note = noteServiceImp.createNotes(notesDto, userId);
@@ -37,7 +37,7 @@ public class NotesController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 	
-	@RequestMapping( value = "/update/{notesId}" , method = RequestMethod.PUT)
+	@RequestMapping( value = "/update/{notesId}" , method = RequestMethod.PUT , produces = MediaType.APPLICATION_JSON_VALUE ,consumes =  MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> updateNotes( @RequestBody notesDto notesDto , @PathVariable Integer notesId ){
 		
 		notesDto updatedNote = noteServiceImp.updateNote(notesDto, notesId);
@@ -48,7 +48,7 @@ public class NotesController {
         return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping( value = "/delete/{notesId}" , method = RequestMethod.DELETE)
+	@RequestMapping( value = "/delete/{notesId}" , method = RequestMethod.DELETE , produces = MediaType.APPLICATION_JSON_VALUE )
 	public ResponseEntity<Map<String, Object>> deleteNotes( @PathVariable Integer notesId ){
 	   noteServiceImp.deleteNote(notesId);
 	
@@ -66,13 +66,13 @@ public class NotesController {
         return new ResponseEntity<List<notesDto>>(Note,HttpStatus.OK);
     }
 	
-	@RequestMapping( value = "/select/{notesId}" , method = RequestMethod.GET)
+	@RequestMapping( value = "/select/{notesId}" , method = RequestMethod.GET , produces = MediaType.APPLICATION_JSON_VALUE )
     public ResponseEntity<notesDto> getNoteById(@PathVariable Integer notesId){
         notesDto note = noteServiceImp.getNote(notesId);
         return new ResponseEntity<notesDto>(note , HttpStatus.ACCEPTED);
     }
 	
-    @RequestMapping(value = "/" , method = RequestMethod.GET)
+    @RequestMapping(value = "/" , method = RequestMethod.GET ,produces = MediaType.APPLICATION_JSON_VALUE )
     @CrossOrigin
     public ResponseEntity<List<notesDto>> getNotes(){
         List<notesDto> Note = noteServiceImp.getAllNote();
@@ -80,3 +80,4 @@ public class NotesController {
     }
     
 }
+
