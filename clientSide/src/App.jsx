@@ -36,14 +36,14 @@ function App() {
     }, []);
 
     useEffect(() => {
-        console.log('Notes:', notes); // Debugging
+        console.log('Notes:', notes); 
     }, [notes]);
     
     useEffect(() => {
-        if( isLoggedIn || showAllNotes ){
+        if(isLoggedIn || showAllNotes){
             fetchNotes()
         }
-    },[isLoggedIn,showAllNotes])
+    },[isLoggedIn])
 
     const fetchNotes = async() => {
             try {
@@ -52,11 +52,12 @@ function App() {
                 const resultUrl = showAllNotes ? 'http://localhost:8080/api/notes/'
                                                : `http://localhost:8080/api/notes/selectUser/${email}`;
 
+                // const resultUrl = `http://localhost:8080/api/notes/selectUser/${email}`
                              console.log('Request URL:', resultUrl);
-
                 const response = await axios.get(resultUrl);
-                console.log('Response data:', response.data);
                 setNotes(response.data);
+                setIsLoggedIn(true)
+                console.log('Response data:', response.data);
             } catch (error) {
                 console.error('Error fetching notes:', error);
                 setError(error)
@@ -86,18 +87,11 @@ function App() {
     const handleShowAddNote = (note) => {
         if (isUpdating) {
             setCurrentNote(note);
-            setIsUpdating(true);
         } else {
             setCurrentNote(null);
-            setIsUpdating(false);
         }
-        setShowAddNoteModal(true);
+        setShowAddNoteModal(true)
     };
-    // const handleShowUpdateNote = (note) => {
-    //     setIsUpdating(true)
-    //     setCurrentNote(note);
-    //     setShowAddNoteModal(true);
-    // }
 
     const handleCloseAddNote = () => {
         setShowAddNoteModal(false)
@@ -114,8 +108,9 @@ function App() {
             const email = sessionStorage.getItem('email')
             // const newNote = {title : note.title , content : note.content }
             const response = await axios.post(`http://localhost:8080/api/notes/create/${email}`, note);
-            setNotes( (prevNotes) => [...prevNotes , response.data])
+            // setNotes( (prevNotes) => [...prevNotes , response.data])
             showAlertMessage('Note added successfully', 'success');
+                fetchNotes()
         }
         catch( error ){
             console.error('Error adding note:', error);
@@ -134,8 +129,11 @@ function App() {
         try{
             const response = await axios.put(`http://localhost:8080/api/notes/update/${currentNote.id}` , updatedNote);
             const newNotes = notes.map( note => (note.id === currentNote.id) ? response.data : note )
-            setNotes(newNotes)
+            // setNotes(newNotes)
             showAlertMessage('Note updated successfully', 'success');
+            
+                fetchNotes()
+            
         }
         catch(error){
             console.error('Error updating note:', error);
@@ -144,12 +142,17 @@ function App() {
     }
 
     const handleSubmitNote = async (note) => {
-        if (isUpdating) {
-            await handleUpdateNote(note);
-        } else {
-            await handleAddNote(note);
+        try {
+            if (isUpdating) {
+                await handleUpdateNote(note);
+            } else {
+                await handleAddNote(note);
+            }
+            handleCloseAddNote();
+        } catch (error) {
+            console.error('Error submitting note:', error);
+            showAlertMessage(`Error submitting note: ${error}`, 'danger');
         }
-        handleCloseAddNote();
     };
 
 
@@ -160,7 +163,8 @@ function App() {
             const deletedNotes = notes.filter( note => note.id !== deleteId );
             setNotes(deletedNotes)
             showAlertMessage('Note deleted successfully', 'success');
-          },1000)
+            setShowDeleteModal(false)
+          },2000)
         }
         catch(error) {
         console.error('Error deleting note:', error);
