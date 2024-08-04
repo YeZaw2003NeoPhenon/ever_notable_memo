@@ -56,7 +56,7 @@ export const AuthComp = ({ onLoginSuccess }) => {
             }
         }
     };
-
+    
     const toggleForm = () => {
         setIsLogin(!isLogin);
         reset();
