@@ -1,18 +1,18 @@
 import { useFormik } from "formik"
 import * as Yup from 'yup'
-import { useEffect } from 'react';
+import { useEffect,useState } from 'react';
 import { Alert , FormGroup , FormControl ,Container , Form, FormLabel, ButtonGroup , Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave , faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faSave , faTimes , faCheckCircle ,faExclamationCircle} from "@fortawesome/free-solid-svg-icons";
 import './noteForm.css'
 export const NoteForm = ({handleClose ,handleSubmitNote,currentExistingNote,alertMessage ,alertVariant}) => {
 
     const isEditing = !!currentExistingNote;
-
+    const [showAlert, setShowAlert] = useState(false);
     const formik = useFormik({
         initialValues : {
-            title: isEditing ? currentExistingNote.title : '',
-            content: isEditing ? currentExistingNote.content : '',
+            title: '',
+            content: '',
         },
         validationSchema: Yup.object({
             title: Yup.string()
@@ -22,31 +22,44 @@ export const NoteForm = ({handleClose ,handleSubmitNote,currentExistingNote,aler
                 .max(500, 'Must be 500 characters or less')
                 .required('Required')
         }),
-        onSubmit: async (values , {setStatus , setSubmitting}) => {
-            setStatus(null)
-            await handleSubmitNote({
-                id: isEditing ? currentExistingNote.id : null,
-                title: values.title,
-                content: values.content
-            });
-            setSubmitting(false);
-            handleClose();
-            setStatus(alertMessage);  
+        onSubmit: async (values , {setSubmitting}) => {
+            try{
+                await handleSubmitNote({
+                    id: isEditing ? currentExistingNote.id : null,
+                    title: values.title,
+                    content: values.content
+                })
+                handleClose();
+            }
+            catch(error){
+                formik.setStatus('Failed to save note')
+            }
+            finally{
+                setSubmitting(false);
+            }
         },
     });
 
     useEffect(() => {
-        if(isEditing){
+        console.log("Current Existing Note:", currentExistingNote);
+        console.log("Formik Values before update:", formik.values);    
+        if(isEditing && currentExistingNote){
             formik.setValues({
                 title : currentExistingNote.title,
-                content : currentExistingNote.content
+                content : currentExistingNote.content ,
             })
+        }
+        else{
+            formik.resetForm()
         }
     },[currentExistingNote , isEditing])
 
     useEffect(() => {
         if (alertMessage) {
-            formik.setStatus(alertMessage);
+            setShowAlert(true);
+            setTimeout(() => {
+                setShowAlert(false);
+            }, 2000); 
         }
     }, [alertMessage]);
 
@@ -57,10 +70,17 @@ export const NoteForm = ({handleClose ,handleSubmitNote,currentExistingNote,aler
 
     return(
         <Container>
-            {alertMessage && <Alert className="text-center fw-bold" variant={alertVariant}>{alertMessage}</Alert>}
+            { showAlert && formik.status && (
+                <Alert className={`alert-custom ${alertVariant} ${showAlert ? '' : 'fade-out'}`} variant={alertVariant}>
+                    <FontAwesomeIcon 
+                        icon={alertVariant === 'success' ? faCheckCircle : faExclamationCircle} 
+                        className="icon" 
+                    />{formik.status}
+                    </Alert>
+            )}
                 <Form noValidate onSubmit={handleFormSubmit} className="note-form">
                 <FormGroup controlId="formTitle">
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel htmlFor="title">Title</FormLabel>
                     <FormControl
                         type="text"
                         name="title"
@@ -69,12 +89,12 @@ export const NoteForm = ({handleClose ,handleSubmitNote,currentExistingNote,aler
                         value={formik.values.title}
                         isInvalid={formik.touched.title && formik.errors.title}
                     />
-                    <FormControl.Feedback type="invalid">
+                    <FormControl.Feedback type="invalid"  variant = "danger">
                         {formik.errors.title}
                     </FormControl.Feedback>
                 </FormGroup>
                 <FormGroup controlId="formContent">
-                    <Form.Label>Content</Form.Label>
+                    <Form.Label htmlFor="content">Content</Form.Label>
                     <Form.Control
                         as="textarea"
                         rows={3}
@@ -84,7 +104,7 @@ export const NoteForm = ({handleClose ,handleSubmitNote,currentExistingNote,aler
                         value={formik.values.content}
                         isInvalid={formik.touched.content && formik.errors.content}
                     />
-                    <FormControl.Feedback type="invalid">
+                    <FormControl.Feedback type="invalid" variant = "danger">
                         {formik.errors.content}
                     </FormControl.Feedback>
                 </FormGroup>
