@@ -3,20 +3,27 @@ package com.example.note_nest_memo.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.note_nest_memo.dtoPlayloads.userDto;
 import com.example.note_nest_memo.service.serviceImp.UserServiceImp;
+
+import jakarta.validation.Valid;
 
 @CrossOrigin
 @RestController
@@ -25,11 +32,35 @@ public class UserController {
 	
 	@Autowired
 	private UserServiceImp userServiceImp;
+	
 	private int count = 0;
 	
 	@RequestMapping( value = "/create" , method = RequestMethod.POST , produces = MediaType.APPLICATION_JSON_VALUE , consumes  = MediaType.APPLICATION_JSON_VALUE)
-	    public ResponseEntity<Object> createUser(@RequestBody userDto user){
-	    Map<String, Object> response = new HashMap<>();
+	    public ResponseEntity<Object> createUser( @Valid @RequestBody userDto user , BindingResult bindingResult){
+		
+//		if( bindingResult.hasErrors()) {
+//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult.getAllErrors().get(0).getDefaultMessage());
+//		}
+		
+		if( bindingResult.hasErrors()) {
+			// str (name) as key , obj (error_message) as value 
+			 Map<String, Object> errorsMap = new HashMap<>();
+			 
+			 for( FieldError error : bindingResult.getFieldErrors()){
+				 errorsMap.put(error.getField() , error.getDefaultMessage());
+			   }
+			 
+			 // getField => table entity name from userDto
+			 // getDefaultMessage => messaged that was binded up with annotations in table
+			 
+				Map<String, Object> response = new HashMap<>();
+				response.put("success", false);
+				response.put("count", -1);
+				response.put("error", errorsMap);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		}
+		
+		Map<String, Object> response = new HashMap<>();
 	    response.put("message", "You Salubriously Created User!");
 	    response.put("success", true);
 	    response.put("count", ++count);
@@ -38,7 +69,18 @@ public class UserController {
 	  }
 	
 	@RequestMapping( value = "/update/{userId}" , method = RequestMethod.PUT , produces = MediaType.APPLICATION_JSON_VALUE , consumes  = MediaType.APPLICATION_JSON_VALUE)
-	    public ResponseEntity<Object> updateUser(@PathVariable Integer userId , @RequestBody userDto user){
+	@ResponseBody
+	    public ResponseEntity<Object> updateUser(@PathVariable Integer userId , @RequestBody @Valid userDto user , BindingResult bindingResult){
+		
+		if(bindingResult.hasErrors()) {
+			Map<String, Object> response = new HashMap<>();
+			response.put("success", false);
+			response.put("count", -1);
+			response.put("errors", 
+					bindingResult.getFieldErrors().stream()
+				    .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
+			 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		}
 	       userDto updatedUser = userServiceImp.updateUser(userId, user);
 		    Map<String, Object> response = new HashMap<>();
 	        response.put("message", "Note Flawlessly Updated!");
@@ -82,7 +124,6 @@ public class UserController {
 	              response.put("status", HttpStatus.UNAUTHORIZED.value());
 	              return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
 	        }
-	        
 	    }
 	
 }
