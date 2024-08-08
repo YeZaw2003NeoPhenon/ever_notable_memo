@@ -3,11 +3,15 @@ package com.example.note_nest_memo.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +20,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.note_nest_memo.dtoPlayloads.notesDto;
 import com.example.note_nest_memo.service.serviceImp.NoteServiceImp;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 @CrossOrigin
 @RestController
@@ -26,19 +34,53 @@ public class NotesController {
 	private NoteServiceImp noteServiceImp;
 	
 	private int count = 0;
+	
 	@RequestMapping( value = "/create/{userId}" , method = RequestMethod.POST ,  produces = MediaType.APPLICATION_JSON_VALUE , consumes =  MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Object> createNotes( @RequestBody notesDto notesDto , @PathVariable String userId ){
+	public ResponseEntity<Object> createNotes( @Valid @RequestBody notesDto notesDto ,  @PathVariable @Email(message = "email must be valid") @NotBlank(message = "email must not be null") String userId , BindingResult bindingResult){
+		
+        if (!Pattern.matches("^[A-Za-z0-9+_.-]+@(.+)$", userId)) {
+            FieldError error = new FieldError("userId", "userId", "Email must be valid");
+            bindingResult.addError(error);
+        }
+        
+		if( bindingResult.hasErrors()) {
+			
+			StringBuilder errorSb = new StringBuilder();
+			
+			for( FieldError error : bindingResult.getFieldErrors()) {
+				errorSb.append(error.getField())
+					   .append(" : ")
+					   .append(error.getDefaultMessage())
+					   .append(" ; ");
+			}
+			
+			 Map<String, Object> response = new HashMap<>();
+			 response.put("success", false);
+			 response.put("count" , -1 );
+			 response.put("errors", errorSb.toString().trim());
+			 
+			 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		}
 		
 		notesDto note = noteServiceImp.createNotes(notesDto, userId);
 		 Map<String, Object> response = new HashMap<>();
 	       response.put("message", "You Crafted off Your Notes Without Any Issues!");
-	        response.put("Your Note Descriptions:", note);
-	        response.put("count", ++count);
+	       response.put("Your Note Descriptions:", note);
+	       response.put("count", ++count);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 	
 	@RequestMapping( value = "/update/{notesId}" , method = RequestMethod.PUT , produces = MediaType.APPLICATION_JSON_VALUE ,consumes =  MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Object> updateNotes( @RequestBody notesDto notesDto , @PathVariable Integer notesId ){
+	public ResponseEntity<Object> updateNotes( @Valid @RequestBody notesDto notesDto , @PathVariable Integer notesId ,BindingResult bindingResult){
+		if(bindingResult.hasErrors()) {
+			Map<String, Object> response = new HashMap<>();
+			response.put("success", false);
+			response.put("count", -1);
+			response.put("errors", bindingResult.getFieldErrors()
+					.stream()
+					.collect(Collectors.toMap(FieldError::getField , FieldError::getDefaultMessage)));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		}
 		
 		notesDto updatedNote = noteServiceImp.updateNote(notesDto, notesId);
 	    Map<String, Object> response = new HashMap<>();
