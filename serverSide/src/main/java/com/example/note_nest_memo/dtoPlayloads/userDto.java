@@ -1,9 +1,22 @@
 package com.example.note_nest_memo.dtoPlayloads;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+
 public class userDto {
+	
     private Integer id;
+    
+    @NotEmpty(message = " Don't be muffled up! Name must not be empty!")
+    @Size(min = 6, max = 30, message = "Name must be between 6 and 30 characters!")
     private String name;
+    
+    @Email(message = "Email must be on correct format!")
     private String email;
+    
+    @NotBlank(message = "password must not be empty!")
     private String password;
 
 	public Integer getId() {
@@ -30,4 +43,6 @@ public class userDto {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	
 }
+
